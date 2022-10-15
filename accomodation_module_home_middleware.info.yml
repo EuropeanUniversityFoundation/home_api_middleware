@@ -1,0 +1,6 @@
+name: HOME middleware
+type: module
+description: Provides a metrics and an authentication middleware endpoint for the HOME API.
+package: HOME
+core: 8.x
+core_version_requirement: ^8 || ^9

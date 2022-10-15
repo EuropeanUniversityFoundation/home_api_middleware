@@ -1,0 +1,6 @@
+# accomodation_module_home_middleware.settings_form:
+#   title: accomodation_module_home_middleware
+#   description: Configure accomodation_module_home_middleware.
+#   parent: system.admin_config_system
+#   route_name: accomodation_module_home_middleware.settings_form
+#   weight: 10

@@ -1,0 +1,8 @@
+administer accomodation_module_home_middleware configuration:
+  title: 'Administer accomodation_module_home_middleware configuration'
+  description: 'Optional description.'
+  restrict access: true
+use accomodation_module_home_middleware:
+  title: 'Access HOME API middleware endpoints'
+  description: 'Permission to access the HOME API middleware endpoints'
+  restrict access: true
