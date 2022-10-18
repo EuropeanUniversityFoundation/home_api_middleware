@@ -1,7 +1,7 @@
 {
   "name": "euf/home_api_middleware",
   "type": "drupal-module",
-  "description": "Home middleware",
+  "description": "Home API middleware",
   "keywords": [
   ],
   "homepage": "https://github.com/EuropeanUniversityFoundation/home_api_middleware",
