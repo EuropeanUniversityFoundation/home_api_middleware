@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\accomodation_module_home_middleware\Controller;
+namespace Drupal\home_api_middleware\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Controller\ControllerBase;
@@ -16,7 +16,7 @@ use Drupal\Core\Site\Settings;
 /**
  * Middleware for the HOME API.
  */
-class HomeSecurityMiddlewareController extends ControllerBase {
+class HomeApiMiddlewareController extends ControllerBase {
 
   /**
    * Guzzle Client for authenticating.
@@ -100,7 +100,7 @@ class HomeSecurityMiddlewareController extends ControllerBase {
 
     // Creates or retrieves SharedTempStore.
     $this->tempStoreFactory = $temp_store_factory;
-    $this->tempStore = $this->tempStoreFactory->get('accomodation_module_home_middleware');
+    $this->tempStore = $this->tempStoreFactory->get('home_api_middleware');
 
     // Sets token data saved in tempStore as class properties.
     $this->expire = $this->tempStore->get('expire');

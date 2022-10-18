@@ -1,12 +1,12 @@
 <?php
 
-namespace Drupal\accomodation_module_home_middleware\Form;
+namespace Drupal\home_api_middleware\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Configure accomodation_module_home_middleware settings for this site.
+ * Configure home_api_middleware settings for this site.
  */
 class SettingsForm extends ConfigFormBase {
 
@@ -14,14 +14,14 @@ class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'accomodation_module_home_middleware_settings';
+    return 'home_api_middleware_settings';
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['accomodation_module_home_middleware.settings'];
+    return ['home_api_middleware.settings'];
   }
 
   /**
@@ -31,7 +31,7 @@ class SettingsForm extends ConfigFormBase {
     $form['example'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Example'),
-      '#default_value' => $this->config('accomodation_module_home_middleware.settings')->get('example'),
+      '#default_value' => $this->config('home_api_middleware.settings')->get('example'),
     ];
     return parent::buildForm($form, $form_state);
   }
@@ -50,7 +50,7 @@ class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('accomodation_module_home_middleware.settings')
+    $this->config('home_api_middleware.settings')
       ->set('example', $form_state->getValue('example'))
       ->save();
     parent::submitForm($form, $form_state);

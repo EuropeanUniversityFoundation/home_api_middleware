@@ -5,10 +5,10 @@ This project contains a module for Drupal 8+, that acts as a middleware for acce
 ## Quick start
 
 In order to install this module, you have to:
-  - download the files and add them in your site's `web/modules/custom/accomodation_module_home_middleware` directory
-  - or install it via composer `composer require euf/home_middleware`
+  - download the files and add them in your site's `web/modules/custom/home_api_middleware` directory
+  - or install it via composer `composer require euf/home_api_middleware`
 
-Once installed, enable the module in Drupal on the admin ui or if you have Drush, type `drush en accomodation_module_home_middleware`
+Once installed, enable the module in Drupal on the admin ui or if you have Drush, type `drush en home_api_middleware`
 
 ## Setting up the module
 

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Primary module hooks for accomodation_module_home_middleware module.
+ * Primary module hooks for home_api_middleware module.
  *
  * @DCG
  * This file is no longer required in Drupal 8.

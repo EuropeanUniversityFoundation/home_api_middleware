@@ -1,0 +1,14 @@
+home_api_middleware.accomodation:
+  path: '/accomodation'
+  defaults:
+    _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareController::handleRequest'
+    _title: 'HOME Security middleware forwarder'
+  requirements:
+    _permission: 'use home_api_middleware'
+home_api_middleware.settings_form:
+  path: '/admin/config/system/home_api_middleware'
+  defaults:
+    _title: 'home_api_middleware settings'
+    _form: 'Drupal\home_api_middleware\Form\SettingsForm'
+  requirements:
+    _permission: 'administer home_api_middleware configuration'
