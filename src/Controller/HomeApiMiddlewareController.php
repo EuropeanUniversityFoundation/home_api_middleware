@@ -108,7 +108,7 @@ class HomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Gets tempstore from the container for the Controller.
+   * Gets services from the container for the Controller.
    */
   public static function create(ContainerInterface $container) {
     return new static(
@@ -126,7 +126,7 @@ class HomeApiMiddlewareController extends ControllerBase {
     }
 
     if ($this->error) {
-      return new JsonResponse($this->error);
+      return new JsonResponse($this->error, $this->error['status_code']);
     }
     $response = $this->sendRequest($request);
 
@@ -135,7 +135,7 @@ class HomeApiMiddlewareController extends ControllerBase {
         $this->secondAttempt = FALSE;
         $this->handleRequest($request);
       }
-      return new JsonResponse($this->error);
+      return new JsonResponse($this->error, $this->error['status_code']);
     }
 
     return new JsonResponse(json_decode($response->getBody()->getContents()));
