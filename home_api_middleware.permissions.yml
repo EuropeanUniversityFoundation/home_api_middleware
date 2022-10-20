@@ -1,7 +1,3 @@
-administer home_api_middleware configuration:
-  title: 'Administer home_api_middleware configuration'
-  description: 'Optional description.'
-  restrict access: true
 use home_api_middleware:
   title: 'Access HOME API middleware endpoints'
   description: 'Permission to access the HOME API middleware endpoints'

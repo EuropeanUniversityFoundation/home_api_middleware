@@ -1,6 +1,0 @@
-# home_api_middleware.settings_form:
-#   title: home_api_middleware
-#   description: Configure home_api_middleware.
-#   parent: system.admin_config_system
-#   route_name: home_api_middleware.settings_form
-#   weight: 10
