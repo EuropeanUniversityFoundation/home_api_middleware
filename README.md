@@ -19,3 +19,15 @@ You'll have to put the HOME API endpoint URLs and credentials into your `local.s
   - `$settings['home_api']['credentials']['password']`: The password to use with the username on the authentication endpoint.
   - `$settings['home_api']['inventory']['base_uri']`: The base URL of the HOME inventory API endpoint. Example: `https://inventory.home.eu`
   - `$settings['home_api']['inventory']['path']`: The subpath of the HOME inventory API endpoint. Example: `/inventory`. This means, the full path of the inventory endpoint will be: `https://inventory.home.eu/inventory`
+
+## Endpoints
+
+The module adds the `/accomodation` endpoint to the site, that uses the credentials, urls and paths to first login to the HOME API middleware, store the JWT token and it's expiry in temporary storage and then call the HOME API's inventory endpoint using the retrieved token to fetch housing data.
+
+  - Method: `GET`
+  - Parameter: `city`
+  - Example usage: `{site_url}/accomodation?city=Brussels`
+
+## Permissions and Authentication
+
+The module provides the `use home_api_middleware` permission, assign it to the roles that should be able to access the endpoint. The client has to take care of authenticating the Drupal users. Currently `api_key` and `cookie` authentication is enabled for the endpoint (in the routing file).
