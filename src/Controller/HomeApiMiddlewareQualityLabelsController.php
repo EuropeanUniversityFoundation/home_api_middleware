@@ -93,7 +93,7 @@ class HomeApiMiddlewareQualityLabelsController extends ControllerBase {
       $this->token = $response['token'];
     }
 
-    $response = $this->sendRequest($request);
+    $response = $this->sendApiRequest($request);
 
     if ($this->error) {
       if ($this->error['status_code'] == 401 && $this->secondAttemptLeft) {
@@ -115,7 +115,7 @@ class HomeApiMiddlewareQualityLabelsController extends ControllerBase {
    * @return \GuzzleHttp\Psr7\Response
    *   The received response.
    */
-  public function sendRequest(Request $request): Response {
+  public function sendApiRequest(Request $request): Response {
     $options = [
       'headers' => [
         'Authorization' => 'Bearer ' . $this->token,
