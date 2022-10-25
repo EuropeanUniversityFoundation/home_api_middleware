@@ -1,8 +1,26 @@
-home_api_middleware.accomodation:
-  path: '/accomodation'
+home_api_middleware.accomodation.inventory:
+  path: '/accommodation/inventory'
   defaults:
-    _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareController::handleRequest'
-    _title: 'HOME Security middleware forwarder'
+    _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareController::handleInventoryRequest'
+    _title: 'HOME API Inventory'
+  requirements:
+    _permission: 'use home_api_middleware'
+  options:
+    _auth: ['key_auth', 'cookie']
+home_api_middleware.accommodation.providers:
+  path: '/accommodation/providers'
+  defaults:
+    _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareController::handleProviderRequest'
+    _title: 'HOME API Providers'
+  requirements:
+    _permission: 'use home_api_middleware'
+  options:
+    _auth: ['key_auth', 'cookie']
+home_api_middleware.accommodation.quality_labels:
+  path: '/accommodation/quality-labels'
+  defaults:
+    _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareController::handleQualityLabelsRequest'
+    _title: 'HOME API Quality labels'
   requirements:
     _permission: 'use home_api_middleware'
   options:
