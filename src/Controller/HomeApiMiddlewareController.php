@@ -75,7 +75,13 @@ class HomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Handle incoming request.
+   * Handle incoming request for inventory endpoint.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   Original request.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response.
    */
   public function handleInventoryRequest(Request $request): JsonResponse {
     $response = $this->authManager->getToken(!$this->secondAttemptLeft);
@@ -92,7 +98,7 @@ class HomeApiMiddlewareController extends ControllerBase {
     if ($this->error) {
       if ($this->error['status_code'] == 401 && $this->secondAttemptLeft) {
         $this->secondAttemptLeft = FALSE;
-        $this->handleRequest($request);
+        $this->handleInventoryRequest($request);
       }
       return new JsonResponse($this->error, $this->error['status_code']);
     }
@@ -124,7 +130,7 @@ class HomeApiMiddlewareController extends ControllerBase {
     if ($this->error) {
       if ($this->error['status_code'] == 401 && $this->secondAttemptLeft) {
         $this->secondAttemptLeft = FALSE;
-        $this->handleRequest($request);
+        $this->handleProviderRequest($request);
       }
       return new JsonResponse($this->error, $this->error['status_code']);
     }
@@ -156,7 +162,7 @@ class HomeApiMiddlewareController extends ControllerBase {
     if ($this->error) {
       if ($this->error['status_code'] == 401 && $this->secondAttemptLeft) {
         $this->secondAttemptLeft = FALSE;
-        $this->handleRequest($request);
+        $this->handleQualityLabelsRequest($request);
       }
       return new JsonResponse($this->error, $this->error['status_code']);
     }
@@ -194,7 +200,7 @@ class HomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Creates and sends the request to HOME API provider endpoint.
+   * Creates and sends the request to HOME API Providers endpoint.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   Original request.
@@ -222,7 +228,7 @@ class HomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Creates and sends the request to HOME API quality labels endpoint.
+   * Creates and sends the request to HOME API Quality labels endpoint.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   Original request.
