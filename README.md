@@ -23,13 +23,25 @@ You'll have to put the HOME API endpoint URLs and credentials into your `local.s
   - `$settings['home_api']['quality_labels']['path']`: The subpath of the HOME accommodation quality labels API endpoint. Example `/labels`;
 
 ## Endpoints
+The module adds three endpoints to the site, that uses the credentials, urls and paths to first login to the HOME API middleware, store the JWT token and it's expiry in temporary storage and then call the HOME API's corresponding endpoint using the retrieved token to fetch data.
 
-The module adds the `/accomodation/inventory` endpoint to the site, that uses the credentials, urls and paths to first login to the HOME API middleware, store the JWT token and it's expiry in temporary storage and then call the HOME API's inventory endpoint using the retrieved token to fetch housing data.
-
+### Inventory endpoint
+  - Path: `/accommodation/inventory`
   - Method: `GET`
-  - Parameter: `city`
-  - Example usage: `{site_url}/accomodation/inventory?city=Brussels`
+  - Parameters: `city`
+  - Example usage: `{site_url}/accommodation/inventory?city=Brussels`
+
+### Providers endpoint
+  - Path: `/accommodation/providers`
+  - Method: `GET`
+  - Parameters: None
+  - Example usage: `{site_url}/accommodation/inventory/providers`
+
+### Quality labels endpoint
+  - Path: `/accomodation/quality-labels`
+  - Method: `GET`
+  - Parameters: None
+  - Example usage: `{site_url}/accomomdation/inventory/quality-labels`
 
 ## Permissions and Authentication
-
 The module provides the `use home_api_middleware` permission, assign it to the roles that should be able to access the endpoint. The client has to take care of authenticating the Drupal users. Currently `api_key` and `cookie` authentication is enabled for the endpoint (in the routing file).
