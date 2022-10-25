@@ -10,8 +10,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use Drupal\Core\TempStore\SharedTempStoreFactory;
 use Drupal\Core\Site\Settings;
+use Drupal\home_api_middleware\HomeApiMiddlewareAuthenticationManager;
 
 /**
  * Middleware for the HOME API.
@@ -19,18 +19,11 @@ use Drupal\Core\Site\Settings;
 class HomeApiMiddlewareController extends ControllerBase {
 
   /**
-   * Guzzle Client for authenticating.
+   * HOME API Authentication MAnager Service.
    *
-   * @var GuzzleHttp\Client
+   * @var \Drupal\home_api_middleware\HomeApiMiddlewareAuthenticationManager
    */
-  protected $authClient;
-
-  /**
-   * Login crendetials to HOME API.
-   *
-   * @var array
-   */
-  private $credentials;
+  protected $authManager;
 
   /**
    * Guzzle Client for forwarding request.
@@ -40,39 +33,18 @@ class HomeApiMiddlewareController extends ControllerBase {
   protected $client;
 
   /**
-   * Drupal SharedTempStoreFactory.
-   *
-   * @var Drupal\Core\TempStore\SharedTempStoreFactory
-   */
-  protected $tempStoreFactory;
-
-  /**
-   * Drupal SharedTempStore created by Factory.
-   *
-   * @var Drupal\Core\TempStore\SharedTempStore
-   */
-  protected $tempStore;
-
-  /**
-   * JWT Token for housing anywhere.
+   * Token retrieved.
    *
    * @var string
    */
-  private $token;
-
-  /**
-   * Expiry of the JWT token.
-   *
-   * @var string
-   */
-  private $expire;
+  protected $token;
 
   /**
    * Indicates if a second attempt to login is allowed and has not happened.
    *
    * @var bool
    */
-  private $secondAttempt = TRUE;
+  private $secondAttemptLeft = TRUE;
 
   /**
    * Error details.
@@ -84,27 +56,12 @@ class HomeApiMiddlewareController extends ControllerBase {
   /**
    * Constructor.
    */
-  public function __construct(SharedTempStoreFactory $temp_store_factory, Settings $settings) {
+  public function __construct(HomeApiMiddlewareAuthenticationManager $auth_manager, Settings $settings) {
     $this->settings = $settings;
-    $this->authClient = new Client([
-      'base_uri' => $this->settings->get('home_api')['login']['base_uri'],
-    ]);
-    $this->credentials = [
-      'username' => $this->settings->get('home_api')['credentials']['username'],
-      'password' => $this->settings->get('home_api')['credentials']['password'],
-    ];
-
+    $this->authManager = $auth_manager;
     $this->client = new Client([
-      'base_uri' => $this->settings->get('home_api')['inventory']['base_uri'],
+      'base_uri' => $this->settings->get('home_api')['base_uri'],
     ]);
-
-    // Creates or retrieves SharedTempStore.
-    $this->tempStoreFactory = $temp_store_factory;
-    $this->tempStore = $this->tempStoreFactory->get('home_api_middleware');
-
-    // Sets token data saved in tempStore as class properties.
-    $this->expire = $this->tempStore->get('expire');
-    $this->token = $this->tempStore->get('token');
   }
 
   /**
@@ -112,27 +69,29 @@ class HomeApiMiddlewareController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('tempstore.shared'),
+      $container->get('home_api_middleware.authentication_manager'),
       $container->get('settings')
     );
   }
 
   /**
-   * Entry point of the route controller.
+   * Handle incoming request.
    */
-  public function handleRequest(Request $request): JsonResponse {
-    if (!$this->tokenValid()) {
-      $response = $this->getToken();
+  public function handleInventoryRequest(Request $request): JsonResponse {
+    $response = $this->authManager->getToken(!$this->secondAttemptLeft);
+
+    if (!isset($response['token'])) {
+      return new JsonResponse($response, $response['status_code']);
+    }
+    else {
+      $this->token = $response['token'];
     }
 
-    if ($this->error) {
-      return new JsonResponse($this->error, $this->error['status_code']);
-    }
-    $response = $this->sendRequest($request);
+    $response = $this->sendInventoryRequest($request);
 
     if ($this->error) {
-      if ($this->error['status_code'] == 401 && $this->secondAttempt) {
-        $this->secondAttempt = FALSE;
+      if ($this->error['status_code'] == 401 && $this->secondAttemptLeft) {
+        $this->secondAttemptLeft = FALSE;
         $this->handleRequest($request);
       }
       return new JsonResponse($this->error, $this->error['status_code']);
@@ -142,52 +101,71 @@ class HomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Checks if token is saved to tempstore and is not expired.
+   * Handle incoming request for provider endpoint.
    *
-   * @return bool
-   *   Returns if saved token should be used.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   Original request.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response.
    */
-  protected function tokenValid(): bool {
-    $valid =
-      !is_null($this->expire) &&
-      !is_null($this->token) &&
-      \strtotime($this->expire) > time();
+  public function handleProviderRequest(Request $request): JsonResponse {
+    $response = $this->authManager->getToken(!$this->secondAttemptLeft);
 
-    return $valid;
+    if (!isset($response['token'])) {
+      return new JsonResponse($response, $response['status_code']);
+    }
+    else {
+      $this->token = $response['token'];
+    }
+
+    $response = $this->sendProviderRequest($request);
+
+    if ($this->error) {
+      if ($this->error['status_code'] == 401 && $this->secondAttemptLeft) {
+        $this->secondAttemptLeft = FALSE;
+        $this->handleRequest($request);
+      }
+      return new JsonResponse($this->error, $this->error['status_code']);
+    }
+
+    return new JsonResponse(json_decode($response->getBody()->getContents()));
   }
 
   /**
-   * Fetches token from HOME login endpoint.
+   * Handle incoming request for quality labels endpoint.
    *
-   * @return \GuzzleHttp\Psr7\Response
-   *   Returns the response.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   Original request.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response.
    */
-  protected function getToken(): Response {
-    $options = [
-      'json' => $this->credentials,
-      // 'http_errors' => FALSE,
-    ];
-    $path = $this->settings->get('home_api')['login']['path'];
+  public function handleQualityLabelsRequest(Request $request): JsonResponse {
+    $response = $this->authManager->getToken(!$this->secondAttemptLeft);
 
-    try {
-      $response = $this->authClient->request('POST', $path, $options);
+    if (!isset($response['token'])) {
+      return new JsonResponse($response, $response['status_code']);
     }
-    catch (ClientException | ServerException $e) {
-      $this->setError($e);
-      return $e->getResponse();
+    else {
+      $this->token = $response['token'];
     }
 
-    $body = json_decode($response->getBody()->getContents());
-    $this->tempStore->set('expire', $body->expire);
-    $this->expire = $body->expire;
-    $this->tempStore->set('token', $body->token);
-    $this->token = $body->token;
+    $response = $this->sendQualityLabelsRequest($request);
 
-    return $response;
+    if ($this->error) {
+      if ($this->error['status_code'] == 401 && $this->secondAttemptLeft) {
+        $this->secondAttemptLeft = FALSE;
+        $this->handleRequest($request);
+      }
+      return new JsonResponse($this->error, $this->error['status_code']);
+    }
+
+    return new JsonResponse(json_decode($response->getBody()->getContents()));
   }
 
   /**
-   * Creates and sends the request to HOME API.
+   * Creates and sends the request to HOME API Inventory endpoint.
    *
    * @param Symfony\Component\HttpFoundation\Request $request
    *   The original Symfony request.
@@ -195,14 +173,13 @@ class HomeApiMiddlewareController extends ControllerBase {
    * @return array
    *   The body of the JSON response as an array.
    */
-  protected function sendRequest(Request $request): Response {
+  protected function sendInventoryRequest(Request $request): Response {
     $query = $request->query->all();
     $options = [
       'headers' => [
         'Authorization' => 'Bearer ' . $this->token,
       ],
       'json' => $query,
-      // 'http_errors' => FALSE,
     ];
     $path = $this->settings->get('home_api')['inventory']['path'];
     try {
@@ -217,7 +194,66 @@ class HomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Gets exception from response.
+   * Creates and sends the request to HOME API provider endpoint.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   Original request.
+   *
+   * @return \GuzzleHttp\Psr7\Response
+   *   The received response.
+   */
+  public function sendProviderRequest(Request $request) {
+    $options = [
+      'headers' => [
+        'Authorization' => 'Bearer ' . $this->token,
+      ],
+    ];
+
+    $path = $this->settings->get('home_api')['providers']['path'];
+    try {
+      $response = $this->client->request('GET', $path, $options);
+    }
+    catch (ClientException | ServerException $e) {
+      $this->setError($e);
+      return $e->getResponse();
+    }
+
+    return $response;
+  }
+
+  /**
+   * Creates and sends the request to HOME API quality labels endpoint.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   Original request.
+   *
+   * @return \GuzzleHttp\Psr7\Response
+   *   The recieved response.
+   */
+  public function sendQualityLabelsRequest(Request $request) {
+    $options = [
+      'headers' => [
+        'Authorization' => 'Bearer ' . $this->token,
+      ],
+    ];
+
+    $path = $this->settings->get('home_api')['quality_labels']['path'];
+    try {
+      $response = $this->client->request('GET', $path, $options);
+    }
+    catch (ClientException | ServerException $e) {
+      $this->setError($e);
+      return $e->getResponse();
+    }
+
+    return $response;
+  }
+
+  /**
+   * Gets error from exception response.
+   *
+   * @param \GuzzleHttp\ClientException|\GuzzleHttp\ServerException $exception
+   *   Incoming exception.
    */
   protected function setError($exception) {
     $message = $exception->getMessage();

@@ -17,16 +17,18 @@ You'll have to put the HOME API endpoint URLs and credentials into your `local.s
   - `$settings['home_api']['login']['path']`: The subpath of the athentication endpoint. Example: `/login`. This means, the full path of the authentication endpoint will be: `https://login.home.eu/login`
   - `$settings['home_api']['credentials']['username']`: The username to log in with on the authentication endpoint.
   - `$settings['home_api']['credentials']['password']`: The password to use with the username on the authentication endpoint.
-  - `$settings['home_api']['inventory']['base_uri']`: The base URL of the HOME inventory API endpoint. Example: `https://inventory.home.eu`
+  - `$settings['home_api']['base_uri']`: The base URL of the HOME inventory API endpoint. Example: `https://inventory.home.eu`
   - `$settings['home_api']['inventory']['path']`: The subpath of the HOME inventory API endpoint. Example: `/inventory`. This means, the full path of the inventory endpoint will be: `https://inventory.home.eu/inventory`
+  - `$settings['home_api']['providers']['path']`: The subpath of the HOME accommodation providers API endpoint. Example `/providers`;
+  - `$settings['home_api']['quality_labels']['path']`: The subpath of the HOME accommodation quality labels API endpoint. Example `/labels`;
 
 ## Endpoints
 
-The module adds the `/accomodation` endpoint to the site, that uses the credentials, urls and paths to first login to the HOME API middleware, store the JWT token and it's expiry in temporary storage and then call the HOME API's inventory endpoint using the retrieved token to fetch housing data.
+The module adds the `/accomodation/inventory` endpoint to the site, that uses the credentials, urls and paths to first login to the HOME API middleware, store the JWT token and it's expiry in temporary storage and then call the HOME API's inventory endpoint using the retrieved token to fetch housing data.
 
   - Method: `GET`
   - Parameter: `city`
-  - Example usage: `{site_url}/accomodation?city=Brussels`
+  - Example usage: `{site_url}/accomodation/inventory?city=Brussels`
 
 ## Permissions and Authentication
 

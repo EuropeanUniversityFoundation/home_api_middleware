@@ -1,0 +1,4 @@
+services:
+  home_api_middleware.authentication_manager:
+    class: Drupal\home_api_middleware\HomeApiMiddlewareAuthenticationManager
+    arguments: ['@tempstore.shared', '@settings']
