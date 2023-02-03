@@ -117,6 +117,14 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
    */
   protected function sendApiRequest(Request $request): Response {
     $query = $request->query->all();
+
+    // Converting numeric parameters to integer.
+    foreach ($query as $name => $value) {
+      if (is_numeric($value)) {
+        $query[$name] = intval($value);
+      }
+    }
+
     $options = [
       'headers' => [
         'Authorization' => 'Bearer ' . $this->token,
