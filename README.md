@@ -45,13 +45,13 @@ The module adds three endpoints to the site, that uses the credentials, urls and
   - Path: `/accommodation/providers`
   - Method: `GET`
   - Parameters: None
-  - Example usage: `{site_url}/accommodation/inventory/providers`
+  - Example usage: `{site_url}/accommodation/providers`
 
 ### Quality labels endpoint
   - Path: `/accomodation/quality-labels`
   - Method: `GET`
   - Parameters: None
-  - Example usage: `{site_url}/accomomdation/inventory/quality-labels`
+  - Example usage: `{site_url}/accomomdation/quality-labels`
 
 ## Permissions and Authentication
 The module provides the `use home_api_middleware` permission, assign it to the roles that should be able to access the endpoint. The client has to take care of authenticating the Drupal users. Currently `api_key` and `cookie` authentication is enabled for the endpoint (in the routing file).
