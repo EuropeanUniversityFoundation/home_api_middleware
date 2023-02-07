@@ -1,14 +1,23 @@
 # HOME middleware project
 
-This project contains a module for Drupal 8+, that acts as a middleware for accessing the HOME project API.
+This project contains a module for Drupal 9+, that acts as a middleware for accessing the HOME project API.
 
 ## Quick start
 
-In order to install this module, you have to:
-  - download the files and add them in your site's `web/modules/custom/home_api_middleware` directory
-  - or install it via composer `composer require euf/home_api_middleware`
-
-Once installed, enable the module in Drupal on the admin ui or if you have Drush, type `drush en home_api_middleware`
+We recommend installing this module via composer. To achieve this, do the following:
+  - Add the vcs to the composer.json file in the repositories section, aftwer the existing entries:
+    ```
+    {
+      ...
+      "repositories": [
+        ...
+      
+        {"type": "vcs", "url": "https://github.com/EuropeanUniversityFoundation/home_api_middleware/"},
+      ],
+    ...
+    ```
+  - Run `composer require euf/home_api_middleware`
+  - Once installed, enable the module in Drupal on the admin ui or if you have Drush, type `drush en home_api_middleware`
 
 ## Setting up the module
 
@@ -30,6 +39,7 @@ The module adds three endpoints to the site, that uses the credentials, urls and
   - Method: `GET`
   - Parameters: `city`
   - Example usage: `{site_url}/accommodation/inventory?city=Brussels`
+  - This parameter is required!
 
 ### Providers endpoint
   - Path: `/accommodation/providers`
