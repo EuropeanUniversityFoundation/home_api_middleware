@@ -5,7 +5,7 @@ This project contains a module for Drupal 9+, that acts as a middleware for acce
 ## Quick start
 
 We recommend installing this module via composer. To achieve this, do the following:
-  - Add the vcs to the composer.json file in the repositories section, aftwer the existing entries:
+  - Add the vcs to the composer.json file in the repositories section, after the existing vcs entries:
     ```
     {
       ...
