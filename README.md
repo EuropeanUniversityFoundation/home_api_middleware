@@ -37,9 +37,9 @@ The module adds three endpoints to the site, that uses the credentials, urls and
 ### Inventory endpoint
   - Path: `/accommodation/inventory`
   - Method: `GET`
-  - Parameters: `city`
+  - Query parameters: `city`
   - Example usage: `{site_url}/accommodation/inventory?city=Brussels`
-  - This parameter is required!
+  - This parameter is required, but can be empty.
 
 ### Providers endpoint
   - Path: `/accommodation/providers`
