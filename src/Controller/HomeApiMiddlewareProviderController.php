@@ -2,15 +2,16 @@
 
 namespace Drupal\home_api_middleware\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Drupal\Core\Site\Settings;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use Drupal\Core\Site\Settings;
+use Drupal\Core\Controller\ControllerBase;
+use Symfony\Component\HttpFoundation\Request;
+use Drupal\Core\TempStore\SharedTempStoreFactory;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\home_api_middleware\HomeApiMiddlewareAuthenticationManager;
 
 /**
@@ -24,6 +25,27 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
    * @var \Drupal\home_api_middleware\HomeApiMiddlewareAuthenticationManager
    */
   protected $authManager;
+
+  /**
+   * Settings for the module.
+   *
+   * @var Drupal\Core\Site\Settings
+   */
+  protected $settings;
+
+  /**
+   * Temporary store factory
+   *
+   * @var Drupal\Core\TempStore\SharedTempStoreFactory
+   */
+  protected $tempStoreFactory;
+
+  /**
+   * Shared temporary store
+   *
+   * @var Drupal\Core\TempStore\SharedTempStore
+   */
+  protected $tempStore;
 
   /**
    * Guzzle Client for forwarding request.
@@ -47,21 +69,19 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
   private $secondAttemptLeft = TRUE;
 
   /**
-   * Error details.
-   *
-   * @var array
-   */
-  private $error;
-
-  /**
    * Constructor.
    */
-  public function __construct(HomeApiMiddlewareAuthenticationManager $auth_manager, Settings $settings) {
+  public function __construct(
+    HomeApiMiddlewareAuthenticationManager $auth_manager,
+    Settings $settings,
+    SharedTempStoreFactory $temp_store_factory)
+  {
     $this->settings = $settings;
     $this->authManager = $auth_manager;
     $this->client = new Client([
       'base_uri' => $this->settings->get('home_api')['base_uri'],
     ]);
+    $this->tempStore = $temp_store_factory->get('home_api_middleware');
   }
 
   /**
@@ -70,7 +90,8 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('home_api_middleware.authentication_manager'),
-      $container->get('settings')
+      $container->get('settings'),
+      $container->get('tempstore.shared')
     );
   }
 
@@ -95,15 +116,21 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
 
     $response = $this->sendApiRequest($request);
 
-    if ($this->error) {
-      if ($this->error['status_code'] == 401 && $this->secondAttemptLeft) {
-        $this->secondAttemptLeft = FALSE;
-        $this->handleRequest($request);
-      }
-      return new JsonResponse($this->error, $this->error['status_code']);
+    $status_code = $response->getStatusCode();
+
+    if ($status_code == 401 && $this->secondAttemptLeft) {
+      $this->secondAttemptLeft = FALSE;
+      $this->tempStore->delete('token');
+      $response = $this->handleRequest($request);
+    }
+    else if ($status_code == 200) {
+      $response = new JsonResponse(json_decode($response->getBody()), $status_code);
+    }
+    else {
+      $response = new JsonResponse(json_decode($response->getBody()->getContents()), $status_code);
     }
 
-    return new JsonResponse(json_decode($response->getBody()->getContents()));
+    return $response;
   }
 
   /**
@@ -127,27 +154,11 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
       $response = $this->client->request('GET', $path, $options);
     }
     catch (ClientException | ServerException $e) {
-      $this->setError($e);
+
       return $e->getResponse();
     }
 
     return $response;
-  }
-
-  /**
-   * Gets error from exception response.
-   *
-   * @param \GuzzleHttp\ClientException|\GuzzleHttp\ServerException $exception
-   *   Incoming exception.
-   */
-  protected function setError($exception) {
-    $message = $exception->getMessage();
-    $status_code = $exception->getResponse()->getStatusCode();
-
-    $this->error = [
-      'message' => $message,
-      'status_code' => $status_code,
-    ];
   }
 
 }

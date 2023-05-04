@@ -3,6 +3,8 @@
 namespace Drupal\home_api_middleware;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 use Drupal\Core\TempStore\SharedTempStoreFactory;
 use Drupal\Core\Site\Settings;
 
@@ -24,6 +26,13 @@ class HomeApiMiddlewareAuthenticationManager {
    * @var GuzzleHttp\Client
    */
   protected $authClient;
+
+  /**
+   * Settings for the module.
+   *
+   * @var Drupal\Core\Site\Settings
+   */
+  protected $settings;
 
   /**
    * Drupal SharedTempStoreFactory.
