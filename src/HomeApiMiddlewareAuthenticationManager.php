@@ -131,10 +131,7 @@ class HomeApiMiddlewareAuthenticationManager {
    *   Returns if saved token should be used.
    */
   protected function tokenValid(): bool {
-    $valid =
-      !is_null($this->expire) &&
-      !is_null($this->token) &&
-      \strtotime($this->expire) > time();
+    $valid = !is_null($this->expire) && !is_null($this->token) && \strtotime($this->expire) > time();
 
     return $valid;
   }

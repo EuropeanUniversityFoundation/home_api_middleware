@@ -34,14 +34,14 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
   protected $settings;
 
   /**
-   * Temporary store factory
+   * Temporary store factory.
    *
    * @var Drupal\Core\TempStore\SharedTempStoreFactory
    */
   protected $tempStoreFactory;
 
   /**
-   * Shared temporary store
+   * Shared temporary store.
    *
    * @var Drupal\Core\TempStore\SharedTempStore
    */
@@ -74,8 +74,7 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
   public function __construct(
     HomeApiMiddlewareAuthenticationManager $auth_manager,
     Settings $settings,
-    SharedTempStoreFactory $temp_store_factory)
-  {
+    SharedTempStoreFactory $temp_store_factory) {
     $this->settings = $settings;
     $this->authManager = $auth_manager;
     $this->client = new Client([
@@ -123,7 +122,7 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
       $this->tempStore->delete('token');
       $response = $this->handleRequest($request);
     }
-    else if ($status_code == 200) {
+    elseif ($status_code == 200) {
       $response = new JsonResponse(json_decode($response->getBody()), $status_code);
     }
     else {
