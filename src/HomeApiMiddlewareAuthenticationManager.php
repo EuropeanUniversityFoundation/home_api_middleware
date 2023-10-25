@@ -2,11 +2,11 @@
 
 namespace Drupal\home_api_middleware;
 
+use Drupal\Core\Site\Settings;
+use Drupal\Core\TempStore\SharedTempStoreFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use Drupal\Core\TempStore\SharedTempStoreFactory;
-use Drupal\Core\Site\Settings;
 
 /**
  * Service for managing HOME API authentication.
@@ -131,10 +131,7 @@ class HomeApiMiddlewareAuthenticationManager {
    *   Returns if saved token should be used.
    */
   protected function tokenValid(): bool {
-    $valid =
-      !is_null($this->expire) &&
-      !is_null($this->token) &&
-      \strtotime($this->expire) > time();
+    $valid = !is_null($this->expire) && !is_null($this->token) && \strtotime($this->expire) > time();
 
     return $valid;
   }
