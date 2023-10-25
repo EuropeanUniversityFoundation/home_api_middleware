@@ -2,11 +2,11 @@
 
 namespace Drupal\home_api_middleware;
 
+use Drupal\Core\Site\Settings;
+use Drupal\Core\TempStore\SharedTempStoreFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use Drupal\Core\TempStore\SharedTempStoreFactory;
-use Drupal\Core\Site\Settings;
 
 /**
  * Service for managing HOME API authentication.
