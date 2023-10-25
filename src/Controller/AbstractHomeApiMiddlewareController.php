@@ -223,7 +223,6 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
     ];
 
     $query = $request->query->all();
-    $query = $this->correctCityDotName($query);
 
     if (!empty($query)) {
       foreach ($query as $name => $value) {
@@ -236,18 +235,6 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
     }
 
     return $options;
-  }
-
-  /**
-   * Handles: "." in query params are converted to "_" by PHP.
-   */
-  private function correctCityDotName(array $query): array {
-    if (array_key_exists('city_name', $query)) {
-      $query['city.name'] = $query['city_name'];
-      unset($query['city_name']);
-    }
-
-    return $query;
   }
 
 }
