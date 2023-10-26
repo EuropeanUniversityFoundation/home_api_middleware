@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
 
   /**
-   * HOME API Authentication MAnager Service.
+   * HOME API Authentication Manager Service.
    *
    * @var \Drupal\home_api_middleware\HomeApiMiddlewareAuthenticationManager
    */
@@ -107,7 +107,6 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
    *   Response from the HOME API.
    */
   public function handleRequest(Request $request, string $path): JsonResponse {
-    // $this->deleteTokenInTempStore();
     $tokenResponse = $this->authManager->getToken(!$this->secondAttemptLeft);
 
     if (!isset($tokenResponse['token'])) {

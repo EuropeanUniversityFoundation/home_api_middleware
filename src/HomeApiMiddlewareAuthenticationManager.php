@@ -80,7 +80,6 @@ class HomeApiMiddlewareAuthenticationManager {
     $this->tempStoreFactory = $temp_store_factory;
     $this->tempStore = $this->tempStoreFactory->get('home_api_middleware');
 
-    // Sets token data saved in tempStore as class properties.
     $this->expire = $this->tempStore->get('expire');
     $this->token = $this->tempStore->get('token');
   }
