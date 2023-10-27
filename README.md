@@ -11,7 +11,7 @@ We recommend installing this module via composer. To achieve this, do the follow
       ...
       "repositories": [
         ...
-      
+
         {"type": "vcs", "url": "https://github.com/EuropeanUniversityFoundation/home_api_middleware/"},
       ],
       ...
@@ -31,7 +31,7 @@ Edit your `settings.php` or `settings.local.php` if in use and add the following
   - `$settings['home_api']['inventory']['path']`: The subpath of the HOME inventory API endpoint
   - `$settings['home_api']['providers']['path']`: The subpath of the HOME accommodation providers API endpoint.
   - `$settings['home_api']['quality_labels']['path']`: The subpath of the HOME accommodation quality labels API endpoint.
- 
+
  Full example of the settings file:
  ```
  ...
@@ -70,4 +70,4 @@ The module adds three endpoints to the site, that uses the credentials, urls and
   - Example usage: `{site_url}/accomomdation/quality-labels`
 
 ## Permissions and Authentication
-The module provides the `use home_api_middleware` permission, assign it to the roles that should be able to access the endpoint. The client has to take care of authenticating the Drupal users. Currently `cookie` authentication is enabled for the endpoint (in the routing file).
+The module provides the `use home_api_middleware` permission, assign it to ALL AUTHENTICATED users for the accommodation module to work properly. The client has to take care of authenticating the Drupal users. Currently `cookie` authentication is enabled for the endpoint (in the routing file).
