@@ -24,8 +24,11 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
    */
   public function handleRequest(Request $request, string $path = NULL): JsonResponse {
     $path = $this->settings->get('home_api')['inventory']['path'];
+    $query = $request->query->all();
 
-    $query = json_encode($request->query->all());
+    $query = $this->processQueryParameters($query);
+
+    $query = json_encode($query);
     $postRequest = new Request(content: $query);
     $postRequest->setMethod('POST');
 

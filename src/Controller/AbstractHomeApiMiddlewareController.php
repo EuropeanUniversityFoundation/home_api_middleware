@@ -143,7 +143,7 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
    *   Subpath to call.
    *
    * @return \GuzzleHttp\Psr7\Response
-   *   Response from the LIVIS API.
+   *   Response from the HOME API.
    */
   public function forwardRequest(Request $request, string $path): Response {
     $method = $request->getMethod();
@@ -159,7 +159,7 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Sends GET request to LIVIS API.
+   * Sends GET request to HOME API.
    */
   public function sendGetRequest(Request $request, string $path): Response {
     $options = $this->getOptions($request);
@@ -176,9 +176,9 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Sends POST request to LIVIS API.
+   * Sends POST request to HOME API.
    */
-  protected function sendPostRequest(Request $request, string $path, int $id = NULL): Response {
+  public function sendPostRequest(Request $request, string $path, int $id = NULL): Response {
     $body = json_decode($request->getContent());
 
     $options = $this->getOptions($request);
@@ -196,7 +196,7 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
-   * Checks if response is 401 and refreshes token if yes.
+   * Refreshes the token if response status code is 401.
    */
   public function tokenNeedsResetting(Response $response) {
     return $response->getStatusCode() == 401 && $this->secondAttemptLeft;
@@ -212,6 +212,30 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
   }
 
   /**
+   * Converts query parameters into numeric if number.
+   *
+   * @param array $query
+   *   The query params in array format.
+   *
+   * @return array|null
+   *   The converted query parameters in array format.
+   */
+  public function processQueryParameters(array $query): ?array {
+    if (!empty($query)) {
+      foreach ($query as $name => $value) {
+        if (is_numeric($value)) {
+          $query[$name] = intval($value);
+        }
+      }
+    }
+    else {
+      return NULL;
+    }
+
+    return $query;
+  }
+
+  /**
    * Creates options array for requests.
    */
   protected function getOptions(Request $request) {
@@ -222,15 +246,10 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
     ];
 
     $query = $request->query->all();
+    $query = $this->processQueryParameters($query);
 
     if (!empty($query)) {
-      foreach ($query as $name => $value) {
-        if (is_numeric($value)) {
-          $query[$name] = intval($value);
-        }
-
-        $options['query'] = $query;
-      }
+      $options['query'] = $query;
     }
 
     return $options;
