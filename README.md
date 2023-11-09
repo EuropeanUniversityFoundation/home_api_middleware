@@ -67,7 +67,7 @@ The module adds three endpoints to the site, that uses the credentials, urls and
   - Path: `/accommodation/quality-labels`
   - Method: `GET`
   - Parameters: None
-  - Example usage: `{site_url}/accomomdation/quality-labels`
+  - Example usage: `{site_url}/accommodation/quality-labels`
 
 ## Permissions and Authentication
 The module provides the `use home api middleware` permission, assign it to ALL AUTHENTICATED users for the accommodation module to work properly. The client has to take care of authenticating the Drupal users. Currently `cookie` authentication is enabled for the endpoint (in the routing file).
