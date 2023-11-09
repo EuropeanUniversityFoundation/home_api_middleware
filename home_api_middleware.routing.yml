@@ -1,5 +1,5 @@
-home_api_middleware.accomodation.inventory:
-  path: '/accommodation/inventory'
+home_api_middleware.accommodation.inventory:
+  path: '/api/accommodation/inventory'
   defaults:
     _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareInventoryController::handleRequest'
     _title: 'HOME API Inventory'
@@ -8,7 +8,7 @@ home_api_middleware.accomodation.inventory:
   options:
     _auth: ['key_auth', 'cookie']
 home_api_middleware.accommodation.providers:
-  path: '/accommodation/providers'
+  path: '/api/accommodation/providers'
   defaults:
     _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareProviderController::handleRequest'
     _title: 'HOME API Providers'
@@ -17,7 +17,7 @@ home_api_middleware.accommodation.providers:
   options:
     _auth: ['key_auth', 'cookie']
 home_api_middleware.accommodation.quality_labels:
-  path: '/accommodation/quality-labels'
+  path: '/api/accommodation/quality-labels'
   defaults:
     _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareQualityLabelsController::handleRequest'
     _title: 'HOME API Quality labels'

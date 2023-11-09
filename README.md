@@ -51,23 +51,23 @@ $settings['home_api']['credentials']['password'] = 'example_password';
 The module adds three endpoints to the site, that uses the credentials, urls and paths to first login to the HOME API middleware, store the JWT token and it's expiry in temporary storage and then call the HOME API's corresponding endpoint using the retrieved token to fetch data.
 
 ### Inventory endpoint
-  - Path: `/accommodation/inventory`
+  - Path: `/api/accommodation/inventory`
   - Method: `GET`
   - Query parameters: (string) `city`, (int) `page`
   - Example usage: `{site_url}/accommodation/inventory?city=Brussels&page=2`
   - City parameter is required, but can be an empty string. Page parameter is optional.
 
 ### Providers endpoint
-  - Path: `/accommodation/providers`
+  - Path: `/api/accommodation/providers`
   - Method: `GET`
   - Parameters: None
   - Example usage: `{site_url}/accommodation/providers`
 
 ### Quality labels endpoint
-  - Path: `/accomodation/quality-labels`
+  - Path: `/api/accommodation/quality-labels`
   - Method: `GET`
   - Parameters: None
-  - Example usage: `{site_url}/accomomdation/quality-labels`
+  - Example usage: `{site_url}/accommodation/quality-labels`
 
 ## Permissions and Authentication
 The module provides the `use home api middleware` permission, assign it to ALL AUTHENTICATED users for the accommodation module to work properly. The client has to take care of authenticating the Drupal users. Currently `cookie` authentication is enabled for the endpoint (in the routing file).
