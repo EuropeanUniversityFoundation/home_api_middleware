@@ -6,7 +6,7 @@ home_api_middleware.accommodation.inventory:
   requirements:
     _permission: 'use home api middleware'
   options:
-    _auth: ['key_auth', 'cookie']
+    _auth: ['key_auth', 'cookie'] # TODO: Remove 'key_auth' in release
 home_api_middleware.accommodation.providers:
   path: '/api/accommodation/providers'
   defaults:
@@ -15,7 +15,7 @@ home_api_middleware.accommodation.providers:
   requirements:
     _permission: 'use home api middleware'
   options:
-    _auth: ['key_auth', 'cookie']
+    _auth: ['key_auth', 'cookie'] # TODO: Remove 'key_auth' in release
 home_api_middleware.accommodation.quality_labels:
   path: '/api/accommodation/quality-labels'
   defaults:
@@ -24,4 +24,4 @@ home_api_middleware.accommodation.quality_labels:
   requirements:
     _permission: 'use home api middleware'
   options:
-    _auth: ['key_auth', 'cookie']
+    _auth: ['key_auth', 'cookie'] # TODO: Remove 'key_auth' in release
