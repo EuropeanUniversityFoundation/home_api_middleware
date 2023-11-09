@@ -9,7 +9,7 @@ use Drupal\Tests\home_api_middleware\Kernel\HomeApiMiddlewareTestBase;
  *
  * @group home_api_middleware
  */
-class HomeApiMiddlewareResponsesTest extends HomeApiMiddlewareTestBase {
+class HomeApiMetricsEndpointsTest extends HomeApiMiddlewareTestBase {
 
   /**
    * Tests if status code is 200 and response is JSON.
