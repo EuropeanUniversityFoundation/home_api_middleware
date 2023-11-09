@@ -17,7 +17,7 @@ We recommend installing this module via composer. To achieve this, do the follow
       ...
     }
     ```
-  - Run `composer require euf/home_api_middleware`
+  - Run `composer require euf/home_api_middleware:dev-master`
   - Once installed, enable the module in Drupal on the admin ui or if you have Drush, type `drush en home_api_middleware`
 
 ## Setting up the module
