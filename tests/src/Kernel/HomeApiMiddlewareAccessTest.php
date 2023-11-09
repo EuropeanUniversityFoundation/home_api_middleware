@@ -35,7 +35,7 @@ class HomeApiMiddlewareAccessTest extends HomeApiMiddlewareTestBase {
   public function testNoAnonymousAccess() {
     $this->switchToUserWithoutAccess();
 
-    $request = $this->createRequest('/accommodation/inventory?city=', 'GET');
+    $request = $this->createRequest('/api/accommodation/inventory?city=', 'GET');
     $response = $this->processRequest($request);
 
     $this->assertEquals($response->getStatusCode(), 403);
@@ -51,7 +51,7 @@ class HomeApiMiddlewareAccessTest extends HomeApiMiddlewareTestBase {
    */
   public function testUserWithAccess() {
 
-    $request = $this->createRequest('/accommodation/inventory?city=', 'GET');
+    $request = $this->createRequest('/api/accommodation/inventory?city=', 'GET');
     $response = $this->processRequest($request);
 
     $this->assertEquals($response->getStatusCode(), 200);
