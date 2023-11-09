@@ -1,4 +1,4 @@
-home_api_middleware.accomodation.inventory:
+home_api_middleware.accommodation.inventory:
   path: '/accommodation/inventory'
   defaults:
     _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareInventoryController::handleRequest'

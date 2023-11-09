@@ -64,7 +64,7 @@ The module adds three endpoints to the site, that uses the credentials, urls and
   - Example usage: `{site_url}/accommodation/providers`
 
 ### Quality labels endpoint
-  - Path: `/accomodation/quality-labels`
+  - Path: `/accommodation/quality-labels`
   - Method: `GET`
   - Parameters: None
   - Example usage: `{site_url}/accomomdation/quality-labels`
