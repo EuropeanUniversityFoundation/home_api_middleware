@@ -54,20 +54,20 @@ The module adds three endpoints to the site, that uses the credentials, urls and
   - Path: `/api/accommodation/inventory`
   - Method: `GET`
   - Query parameters: (string) `city`, (int) `page`
-  - Example usage: `{site_url}/accommodation/inventory?city=Brussels&page=2`
+  - Example usage: `{site_url}/api/accommodation/inventory?city=Brussels&page=2`
   - City parameter is required, but can be an empty string. Page parameter is optional.
 
 ### Providers endpoint
   - Path: `/api/accommodation/providers`
   - Method: `GET`
   - Parameters: None
-  - Example usage: `{site_url}/accommodation/providers`
+  - Example usage: `{site_url}/api/accommodation/providers`
 
 ### Quality labels endpoint
   - Path: `/api/accommodation/quality-labels`
   - Method: `GET`
   - Parameters: None
-  - Example usage: `{site_url}/accommodation/quality-labels`
+  - Example usage: `{site_url}/api/accommodation/quality-labels`
 
 ## Permissions and Authentication
 The module provides the `use home api middleware` permission, assign it to ALL AUTHENTICATED users for the accommodation module to work properly. The client has to take care of authenticating the Drupal users. Currently `cookie` authentication is enabled for the endpoint (in the routing file).
