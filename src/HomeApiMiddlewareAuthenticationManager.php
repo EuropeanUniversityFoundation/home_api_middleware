@@ -44,7 +44,7 @@ class HomeApiMiddlewareAuthenticationManager {
   /**
    * Drupal SharedTempStore created by Factory.
    *
-   * @var Drupal\Core\TempStore\SharedTempStore
+   * @var \Drupal\Core\TempStore\SharedTempStore
    */
   protected $tempStore;
 
