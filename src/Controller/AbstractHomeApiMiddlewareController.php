@@ -207,7 +207,7 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
    */
   public function deleteTokenInTempStore() {
     $this->secondAttemptLeft = FALSE;
-    $this->tempStore->set('expired', TRUE);
+    $this->tempStore->delete('expire');
     $this->tempStore->delete('token');
   }
 

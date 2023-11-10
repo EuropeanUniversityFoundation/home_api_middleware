@@ -1,5 +1,6 @@
 home_api_middleware.accommodation.inventory:
   path: '/api/accommodation/inventory'
+  methods: ['GET']
   defaults:
     _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareInventoryController::handleRequest'
     _title: 'HOME API Inventory'
@@ -9,6 +10,7 @@ home_api_middleware.accommodation.inventory:
     _auth: ['key_auth', 'cookie'] # TODO: Remove 'key_auth' in release
 home_api_middleware.accommodation.providers:
   path: '/api/accommodation/providers'
+  methods: ['GET']
   defaults:
     _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareProviderController::handleRequest'
     _title: 'HOME API Providers'
@@ -18,6 +20,7 @@ home_api_middleware.accommodation.providers:
     _auth: ['key_auth', 'cookie'] # TODO: Remove 'key_auth' in release
 home_api_middleware.accommodation.quality_labels:
   path: '/api/accommodation/quality-labels'
+  methods: ['GET']
   defaults:
     _controller: '\Drupal\home_api_middleware\Controller\HomeApiMiddlewareQualityLabelsController::handleRequest'
     _title: 'HOME API Quality labels'
