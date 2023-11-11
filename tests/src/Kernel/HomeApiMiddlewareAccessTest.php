@@ -6,7 +6,7 @@ use Drupal\Tests\home_api_middleware\Kernel\HomeApiMiddlewareTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 
 /**
- * Test description.
+ * Tests access to endpoints.
  *
  * @group home_api_middleware
  */
@@ -32,29 +32,43 @@ class HomeApiMiddlewareAccessTest extends HomeApiMiddlewareTestBase {
    * @return void
    *   Void.
    */
-  public function testNoAnonymousAccess() {
+  public function testAnonymousAccessInventory() {
     $this->switchToUserWithoutAccess();
 
-    $request = $this->createRequest('/accommodation/inventory?city=', 'GET');
+    $request = $this->createRequest('/api/accommodation/inventory?city=', 'GET');
     $response = $this->processRequest($request);
 
     $this->assertEquals($response->getStatusCode(), 403);
   }
 
   /**
-   * Tests with a user with correct permissions.
-   *
-   * User is created and switched to in parent::setUp.
+   * Tests access as anonymous user.
    *
    * @return void
    *   Void.
    */
-  public function testUserWithAccess() {
+  public function testAnonymousAccessProviders() {
+    $this->switchToUserWithoutAccess();
 
-    $request = $this->createRequest('/accommodation/inventory?city=', 'GET');
+    $request = $this->createRequest('/api/accommodation/providers', 'GET');
     $response = $this->processRequest($request);
 
-    $this->assertEquals($response->getStatusCode(), 200);
+    $this->assertEquals($response->getStatusCode(), 403);
+  }
+
+  /**
+   * Tests access as anonymous user.
+   *
+   * @return void
+   *   Void.
+   */
+  public function testAnonymousAccessQualityLabels() {
+    $this->switchToUserWithoutAccess();
+
+    $request = $this->createRequest('/api/accommodation/quality-labels', 'GET');
+    $response = $this->processRequest($request);
+
+    $this->assertEquals($response->getStatusCode(), 403);
   }
 
 }

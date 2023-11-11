@@ -3,10 +3,7 @@
 namespace Drupal\Tests\home_api_middleware\Kernel;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\user\Entity\Role;
-use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -30,37 +27,7 @@ class HomeApiMiddlewareTestBase extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-
-    $default_settings = Settings::getAll();
-    include_once 'settings.mocked.php';
-    $settings = array_merge($default_settings, $home_settings);
-    new Settings($settings);
-
     $this->installEntitySchema('user');
-
-    // Create and save a role with permission to call endpoints.
-    $role_with_access = Role::create(
-      [
-        'label' => 'API user',
-        'id' => 'api_user',
-        'permissions' => [
-          'use home api middleware',
-        ],
-      ]
-    );
-
-    $role_with_access->save();
-
-    // Create user having the role with permissions to call endpoints.
-    $userWithAccess = User::create([
-      'name' => $this->randomMachineName(),
-      'roles' => [$role_with_access->id()],
-    ]);
-    $userWithAccess->save();
-
-    /** @var \Drupal\Core\Session\AccountSwitcherInterface $account_switcher */
-    $account_switcher = \Drupal::service('account_switcher');
-    $account_switcher->switchTo($userWithAccess);
   }
 
   /**
