@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareController {
 
+  // Temporary. Adds default sorting by this attribute to avoid item randomisation.
+  private const DEFAULT_SORT_ATTRIBUTE = 'rent';
+
   /**
    * Transforms the incoming GET request to a POST request and forwards it.
    *
@@ -32,6 +35,8 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
 
     $response = parent::handleRequest($request, $path);
 
+    $response = $this->removeDuplicates($response);
+
     return $response;
   }
 
@@ -52,6 +57,11 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
     if (!array_key_exists('city', $query)) {
       $query['city'] = '';
     }
+
+    // Adds sorting by price to avoid order randomisation by the HOME API. Temporary.
+    if (!array_key_exists('sortBy', $query) || $query['sortBy'] == '') {
+      $query['sortBy'] = self::DEFAULT_SORT_ATTRIBUTE;
+    }
     $query = $this->processQueryParameters($query);
 
     $query = json_encode($query);
@@ -59,6 +69,37 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
     $postRequest->setMethod('POST');
 
     return $postRequest;
+  }
+
+  /**
+   * Removes duplicated items. Temporary.
+   *
+   * Should be a temporary solution until the API is fixed.
+   *
+   * @param \Symfony\Component\HttpFoundation\JsonResponse $response
+   *   The response from the Controller.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The response without the duplicates.
+   */
+  public function removeDuplicates(JsonResponse $response): JsonResponse {
+    $content = json_decode($response->getContent());
+    $ids = [];
+
+    foreach ($content->listings as $key => $listing) {
+      if (in_array($listing->id, $ids)) {
+        unset($content->listings[$key]);
+        continue;
+      }
+      else {
+        $ids[] = $listing->id;
+      }
+    }
+
+    $content->listings = array_values($content->listings);
+    $response->setContent(json_encode($content));
+
+    return $response;
   }
 
 }
