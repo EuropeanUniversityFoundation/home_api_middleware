@@ -53,9 +53,12 @@ The module adds three endpoints to the site, that uses the credentials, urls and
 ### Inventory endpoint
   - Path: `/api/accommodation/inventory`
   - Method: `GET`
-  - Query parameters: (string) `city`, (int) `page`
+  - Query parameters:
+    - (string) `city`: If omitted, the parameter is automatically added to the forwarded request with an empty string for its value, because this parameter is required
+    - (int) `page`: If omitted, defaults to 1
+    - (string) `sortBy`: If omitted, defaults to rent
+    - (string) `sortOrder`: If omitted, defaults to ascending. Possible values: asc / desc
   - Example usage: `{site_url}/api/accommodation/inventory?city=Brussels&page=2`
-  - City parameter is required, but can be an empty string. Page parameter is optional.
 
 ### Providers endpoint
   - Path: `/api/accommodation/providers`
