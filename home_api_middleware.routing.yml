@@ -7,7 +7,7 @@ home_api_middleware.accommodation.inventory:
   requirements:
     _permission: 'use home api middleware'
   options:
-    _auth: ['key_auth', 'cookie'] # TODO: Remove 'key_auth' in release
+    _auth: ['cookie']
 home_api_middleware.accommodation.providers:
   path: '/api/accommodation/providers'
   methods: ['GET']
@@ -17,7 +17,7 @@ home_api_middleware.accommodation.providers:
   requirements:
     _permission: 'use home api middleware'
   options:
-    _auth: ['key_auth', 'cookie'] # TODO: Remove 'key_auth' in release
+    _auth: ['cookie']
 home_api_middleware.accommodation.quality_labels:
   path: '/api/accommodation/quality-labels'
   methods: ['GET']
@@ -27,4 +27,4 @@ home_api_middleware.accommodation.quality_labels:
   requirements:
     _permission: 'use home api middleware'
   options:
-    _auth: ['key_auth', 'cookie'] # TODO: Remove 'key_auth' in release
+    _auth: ['cookie']
