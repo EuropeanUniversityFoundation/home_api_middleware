@@ -86,17 +86,20 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
     $content = json_decode($response->getContent());
     $ids = [];
 
-    foreach ($content->listings as $key => $listing) {
-      if (in_array($listing->id, $ids)) {
-        unset($content->listings[$key]);
-        continue;
+    if (!is_null($content->listings)) {
+      foreach ($content->listings as $key => $listing) {
+        if (in_array($listing->id, $ids)) {
+          unset($content->listings[$key]);
+          continue;
+        }
+        else {
+          $ids[] = $listing->id;
+        }
       }
-      else {
-        $ids[] = $listing->id;
-      }
+
+      $content->listings = array_values($content->listings);
     }
 
-    $content->listings = array_values($content->listings);
     $response->setContent(json_encode($content));
 
     return $response;
