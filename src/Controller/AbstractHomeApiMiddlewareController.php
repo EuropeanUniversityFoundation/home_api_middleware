@@ -116,10 +116,6 @@ abstract class AbstractHomeApiMiddlewareController extends ControllerBase {
       $this->token = $tokenResponse['token'];
     }
 
-    if ($this->secondAttemptLeft) {
-      // $this->token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ5OTk1OTQsIm9yaWdfaWF0IjoxNjc0ODI2Nzk0LCJ1c2VySWQiOiJ0ZXN0QGdtYWlsLmNvbSJ9.j_Ivaey_JprsIX26Bz59OYFv_vB7b8uUaFIhVui_Ovc';
-    }
-
     $response = $this->forwardRequest($request, $path);
 
     $status_code = $response->getStatusCode();

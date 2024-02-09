@@ -45,6 +45,10 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
       $requestedPage = 1;
     }
 
+    if (!is_int($requestedPage)) {
+      $requestedPage = 1;
+    }
+
     $data = $this->fetchAllData($request, $path);
     $data = $this->removeDuplicateListings($data);
     $data = $this->addPaginationData($data, $requestedPage);
