@@ -13,6 +13,8 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
 
   // Temporary. Adds default sorting by this attribute to avoid item randomisation.
   private const DEFAULT_SORT_ATTRIBUTE = 'rent';
+  // Temporary. Adds default page size for middleware pagination.
+  private const DEFAULT_PAGE_SIZE = 20;
 
   /**
    * Transforms the incoming GET request to a POST request and forwards it.
@@ -30,14 +32,22 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
 
     // If the request has already been transformed to a POST, it should not be transformed again.
     if ($request->getMethod() == 'GET') {
-      $request = $this->transformRequest($request);
+      if ($request->query->has('page')) {
+        $requestedPage = $request->query->get('page');
+      }
+      else {
+        $requestedPage = 1;
+      }
+      // Removes the page parameter from the query.
+      $request->query->remove('page');
     }
 
-    $response = parent::handleRequest($request, $path);
+    $data = $this->fetchAllData($request, $path);
+    $data = $this->removeDuplicateListings($data);
+    $data = $this->addPaginationData($data, $requestedPage);
+    $data = $this->applyPagination($data, $requestedPage);
 
-    $response = $this->removeDuplicates($response);
-
-    return $response;
+    return new JsonResponse($data);
   }
 
   /**
@@ -72,24 +82,20 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
   }
 
   /**
-   * Removes duplicated items. Temporary.
+   * Removes duplicate listings from the aggregated response data.
    *
-   * Should be a temporary solution until the API is fixed.
+   * @param array $data
+   *   The input array containing unfiltered listings.
    *
-   * @param \Symfony\Component\HttpFoundation\JsonResponse $response
-   *   The response from the Controller.
-   *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
-   *   The response without the duplicates.
+   * @return array
+   *   The array with duplicate listings removed.
    */
-  public function removeDuplicates(JsonResponse $response): JsonResponse {
-    $content = json_decode($response->getContent());
+  public function removeDuplicateListings(array $data): array {
     $ids = [];
-
-    if (!is_null($content->listings)) {
-      foreach ($content->listings as $key => $listing) {
+    if (!is_null($data['listings'])) {
+      foreach ($data['listings'] as $key => $listing) {
         if (in_array($listing->id, $ids)) {
-          unset($content->listings[$key]);
+          unset($data['listings'][$key]);
           continue;
         }
         else {
@@ -97,12 +103,101 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
         }
       }
 
-      $content->listings = array_values($content->listings);
+      $data['listings'] = array_values($data['listings']);
     }
 
-    $response->setContent(json_encode($content));
+    return $data;
+  }
 
-    return $response;
+  /**
+   * Fetches all data across all pages of the resulting collection.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   * @param mixed $path
+   *   Path in the HOME API.
+   *
+   * @return array
+   *   An array containing the metadata, empty pagination data and listings.
+   */
+  public function fetchAllData(Request $request, $path): array {
+    $postRequest = $this->transformRequest($request);
+    $response = parent::handleRequest($postRequest, $path);
+    $content = json_decode($response->getContent());
+
+    $pageCount = $content->pagination->totalPages;
+    $listingData = $content->listings;
+    $metaData = $content->metadata;
+
+    if (!is_null($listingData) && $pageCount > 1) {
+      for ($i = 2; $i <= $pageCount; $i++) {
+        $request->query->set('page', $i);
+        $postRequest = $this->transformRequest($request);
+        $response = parent::handleRequest($postRequest, $path);
+        $pageListings = json_decode($response->getContent())->listings;
+        $listingData = array_merge($listingData, $pageListings);
+      }
+    }
+
+    return [
+      'metadata' => $metaData,
+      'pagination' => [],
+      'listings' => $listingData,
+    ];
+  }
+
+  /**
+   * Adds pagination data to the merged array.
+   *
+   * @param array $data
+   *   Array containing metadata and listings.
+   * @param int $requestedPage
+   *   The requested page number for pagination.
+   *
+   * @return array
+   *   The array with pagination data added.
+   */
+  public function addPaginationData(array $data, int $requestedPage = 1): array {
+    if (!is_null($data['listings'])) {
+      $listingCount = count($data['listings']);
+      $totalPages = ceil($listingCount / self::DEFAULT_PAGE_SIZE);
+    }
+    else {
+      $totalPages = 0;
+      $listingCount = 0;
+    }
+
+    $data['pagination'] = [
+      'page' => $requestedPage,
+      'size' => self::DEFAULT_PAGE_SIZE,
+      'totalPages' => $totalPages,
+      'totalListings' => $listingCount,
+    ];
+
+    return $data;
+  }
+
+  /**
+   * Applies pagination to the data array containing the listings.
+   *
+   * @param array $data
+   *   The data array with the listings to be paginated.
+   * @param int $requestedPage
+   *   The requested page number for pagination.
+   *
+   * @return array
+   *   The data array with pagination applied
+   */
+  public function applyPagination(array $data, int $requestedPage = 1): array {
+    if (!is_null($data['listings'])) {
+      $data['listings'] = array_slice($data['listings'], ($requestedPage - 1) * self::DEFAULT_PAGE_SIZE, self::DEFAULT_PAGE_SIZE);
+    }
+
+    if (empty($data['listings'])) {
+      $data['listings'] = NULL;
+    }
+
+    return $data;
   }
 
 }
