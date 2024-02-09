@@ -34,12 +34,15 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
     if ($request->getMethod() == 'GET') {
       if ($request->query->has('page')) {
         $requestedPage = $request->query->get('page');
+        // Removes the page parameter from the query.
+        $request->query->remove('page');
       }
       else {
         $requestedPage = 1;
       }
-      // Removes the page parameter from the query.
-      $request->query->remove('page');
+    }
+    else {
+      $requestedPage = 1;
     }
 
     $data = $this->fetchAllData($request, $path);
@@ -121,7 +124,13 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
    *   An array containing the metadata, empty pagination data and listings.
    */
   public function fetchAllData(Request $request, $path): array {
-    $postRequest = $this->transformRequest($request);
+    if ($request->getMethod() == 'POST') {
+      $postRequest = $request;
+    }
+    else {
+      $postRequest = $this->transformRequest($request);
+    }
+
     $response = parent::handleRequest($postRequest, $path);
     $content = json_decode($response->getContent());
 
@@ -131,11 +140,19 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
 
     if (!is_null($listingData) && $pageCount > 1) {
       for ($i = 2; $i <= $pageCount; $i++) {
-        $request->query->set('page', $i);
-        $postRequest = $this->transformRequest($request);
-        $response = parent::handleRequest($postRequest, $path);
-        $pageListings = json_decode($response->getContent())->listings;
-        $listingData = array_merge($listingData, $pageListings);
+        if ($request->getMethod() == 'GET') {
+          $request->query->set('page', $i);
+          $postRequest = $this->transformRequest($request);
+          $response = parent::handleRequest($postRequest, $path);
+          $pageListings = json_decode($response->getContent())->listings;
+          $listingData = array_merge($listingData, $pageListings);
+        }
+        else {
+          $postRequest = $this->rebuildPostRequest($postRequest, $i);
+          $response = parent::handleRequest($postRequest, $path);
+          $pageListings = json_decode($response->getContent())->listings;
+          $listingData = array_merge($listingData, $pageListings);
+        }
       }
     }
 
@@ -198,6 +215,34 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
     }
 
     return $data;
+  }
+
+  /**
+   * A function to rebuild a post request with a new page number.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The original request object.
+   * @param int $pageNumber
+   *   The new page number for the post request.
+   *
+   * @return \Symfony\Component\HttpFoundation\Request
+   *   The rebuilt request object.
+   */
+  public function rebuildPostRequest(Request $request, int $pageNumber): Request {
+    $content = json_decode($request->getContent());
+    $content->page = $pageNumber;
+
+    $request->initialize(
+      [],
+      $request->request->all(),
+      $request->attributes->all(),
+      $request->cookies->all(),
+      $request->files->all(),
+      $request->server->all(),
+      json_encode($content)
+    );
+
+    return $request;
   }
 
 }
