@@ -45,8 +45,11 @@ class HomeApiMiddlewareInventoryController extends AbstractHomeApiMiddlewareCont
       $requestedPage = 1;
     }
 
-    if (!is_int($requestedPage)) {
+    if (!is_numeric($requestedPage)) {
       $requestedPage = 1;
+    }
+    else {
+      $requestedPage = (int) $requestedPage;
     }
 
     $data = $this->fetchAllData($request, $path);
