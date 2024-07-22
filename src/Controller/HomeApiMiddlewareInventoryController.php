@@ -2,17 +2,17 @@
 
 namespace Drupal\home_api_middleware\Controller;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
+use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\TempStore\SharedTempStoreFactory;
+use Drupal\home_api_middleware\HomeApiMiddlewareAuthenticationManager;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\TempStore\SharedTempStoreFactory;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use GuzzleHttp\Psr7\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\home_api_middleware\HomeApiMiddlewareAuthenticationManager;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Middleware for the HOME API.
@@ -55,14 +55,14 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
   protected $settings;
 
   /**
-   * Temporary store factory
+   * Temporary store factory.
    *
    * @var Drupal\Core\TempStore\SharedTempStoreFactory
    */
   protected $tempStoreFactory;
 
   /**
-   * Shared temporary store
+   * Shared temporary store.
    *
    * @var Drupal\Core\TempStore\SharedTempStore
    */
@@ -74,15 +74,15 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
   public function __construct(
     HomeApiMiddlewareAuthenticationManager $auth_manager,
     Settings $settings,
-    SharedTempStoreFactory $temp_store_factory)
-    {
-      $this->settings = $settings;
-      $this->authManager = $auth_manager;
-      $this->client = new Client([
-        'base_uri' => $this->settings->get('home_api')['base_uri'],
-      ]);
-      $this->tempStore = $temp_store_factory->get('home_api_middleware');
-    }
+    SharedTempStoreFactory $temp_store_factory
+  ) {
+    $this->settings = $settings;
+    $this->authManager = $auth_manager;
+    $this->client = new Client([
+      'base_uri' => $this->settings->get('home_api')['base_uri'],
+    ]);
+    $this->tempStore = $temp_store_factory->get('home_api_middleware');
+  }
 
   /**
    * Gets services from the container for the Controller.
@@ -105,6 +105,9 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
    *   The response.
    */
   public function handleRequest(Request $request): JsonResponse {
+    // if ($this->secondAttemptLeft) {
+    //   $this->tempStore->set('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY3OTQ3MzcsIm9yaWdfaWF0IjoxNjY2NjIxOTM3LCJ1c2VySWQiOiJ0ZXN0QGdtYWlsLmNvbSJ9.c5j1jTcvtxElNbLnc037AQXPnaQpssraTsrj-QkCwnA');
+    // }
     $response = $this->authManager->getToken(!$this->secondAttemptLeft);
 
     if (!isset($response['token'])) {
@@ -123,7 +126,7 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
       $this->tempStore->delete('token');
       $response = $this->handleRequest($request);
     }
-    else if ($status_code == 200) {
+    elseif ($status_code == 200) {
       $response = new JsonResponse(json_decode($response->getBody()), $status_code);
     }
     else {
@@ -139,7 +142,7 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
    * @param Symfony\Component\HttpFoundation\Request $request
    *   The original Symfony request.
    *
-   * @return Response
+   * @return \GuzzleHttp\Psr7\Response
    *   The response.
    */
   protected function sendApiRequest(Request $request): Response {
@@ -150,6 +153,14 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
       if (is_numeric($value)) {
         $query[$name] = intval($value);
       }
+    }
+
+    // Sets default sorting and ascending order by rent.
+    if (!array_key_exists('sortBy', $query)) {
+      $query['sortBy'] = 'rent';
+    }
+    if (!array_key_exists('sortOrder', $query)) {
+      $query['sortOrder'] = 'asc';
     }
 
     $options = [
