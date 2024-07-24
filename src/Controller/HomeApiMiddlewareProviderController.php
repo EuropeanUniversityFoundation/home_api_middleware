@@ -104,13 +104,13 @@ class HomeApiMiddlewareProviderController extends ControllerBase {
    *   The response.
    */
   public function handleRequest(Request $request): JsonResponse {
-    $response = $this->authManager->getToken(!$this->secondAttemptLeft);
+    $tokenResponse = $this->authManager->getToken(!$this->secondAttemptLeft);
 
-    if (!isset($response['token'])) {
-      return new JsonResponse($response, $response['status_code']);
+    if (!isset($tokenResponse['token'])) {
+      return new JsonResponse($tokenResponse, $tokenResponse['status_code']);
     }
     else {
-      $this->token = $response['token'];
+      $this->token = $tokenResponse['token'];
     }
 
     $response = $this->sendApiRequest($request);

@@ -108,13 +108,13 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
     // if ($this->secondAttemptLeft) {
     //   $this->tempStore->set('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY3OTQ3MzcsIm9yaWdfaWF0IjoxNjY2NjIxOTM3LCJ1c2VySWQiOiJ0ZXN0QGdtYWlsLmNvbSJ9.c5j1jTcvtxElNbLnc037AQXPnaQpssraTsrj-QkCwnA');
     // }
-    $response = $this->authManager->getToken(!$this->secondAttemptLeft);
+    $tokenResponse = $this->authManager->getToken(!$this->secondAttemptLeft);
 
-    if (!isset($response['token'])) {
-      return new JsonResponse($response, $response['status_code']);
+    if (!isset($tokenResponse['token'])) {
+      return new JsonResponse($tokenResponse, $tokenResponse['status_code']);
     }
     else {
-      $this->token = $response['token'];
+      $this->token = $tokenResponse['token'];
     }
 
     $response = $this->sendApiRequest($request);
