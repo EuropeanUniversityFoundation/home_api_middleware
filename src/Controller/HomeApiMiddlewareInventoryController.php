@@ -155,14 +155,6 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
       }
     }
 
-    // Sets default sorting and ascending order by rent.
-    if (!array_key_exists('sortBy', $query)) {
-      $query['sortBy'] = 'rent';
-    }
-    if (!array_key_exists('sortOrder', $query)) {
-      $query['sortOrder'] = 'asc';
-    }
-
     $options = [
       'headers' => [
         'Authorization' => 'Bearer ' . $this->token,
