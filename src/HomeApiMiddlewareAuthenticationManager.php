@@ -49,7 +49,7 @@ class HomeApiMiddlewareAuthenticationManager {
   protected $tempStore;
 
   /**
-   * JWT Token for housing anywhere.
+   * JWT Token for the HOME API.
    *
    * @var string
    */
