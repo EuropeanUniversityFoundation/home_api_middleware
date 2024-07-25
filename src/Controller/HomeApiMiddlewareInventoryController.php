@@ -105,9 +105,6 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
    *   The response.
    */
   public function handleRequest(Request $request): JsonResponse {
-    // if ($this->secondAttemptLeft) {
-    //   $this->tempStore->set('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY3OTQ3MzcsIm9yaWdfaWF0IjoxNjY2NjIxOTM3LCJ1c2VySWQiOiJ0ZXN0QGdtYWlsLmNvbSJ9.c5j1jTcvtxElNbLnc037AQXPnaQpssraTsrj-QkCwnA');
-    // }
     $tokenResponse = $this->authManager->getToken(!$this->secondAttemptLeft);
 
     if (!isset($tokenResponse['token'])) {
@@ -118,7 +115,6 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
     }
 
     $response = $this->sendApiRequest($request);
-
     $status_code = $response->getStatusCode();
 
     if ($status_code == 401 && $this->secondAttemptLeft) {
@@ -149,6 +145,7 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
     $query = $request->query->all();
 
     // Converting numeric parameters to integer.
+    // @todo consider using a constant storing parameter types
     foreach ($query as $name => $value) {
       if (is_numeric($value)) {
         $query[$name] = intval($value);
