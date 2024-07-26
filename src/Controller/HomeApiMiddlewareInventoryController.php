@@ -68,6 +68,21 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
    */
   protected $tempStore;
 
+  const NUMERIC_QUERY_PARAMS = [
+    'int' => [
+      'page',
+      'rentfrom',
+      'rentto',
+      'totalsizefrom',
+      'totalsizeto',
+      'bedroomsizefrom',
+      'bedroomsizeto',
+      'bedroomcountfrom',
+      'bedroomcountto',
+    ],
+    'float' => [],
+  ];
+
   /**
    * Constructor.
    */
@@ -142,13 +157,16 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
    *   The response.
    */
   protected function sendApiRequest(Request $request): Response {
+    // Query parameters for GET requests are always returned as strings.
     $query = $request->query->all();
 
-    // Converting numeric parameters to integer.
-    // @todo consider using a constant storing parameter types
+    // Converting numeric query parameters to numbers for POST request.
     foreach ($query as $name => $value) {
-      if (is_numeric($value)) {
-        $query[$name] = intval($value);
+      if (in_array(mb_strtolower($name), self::NUMERIC_QUERY_PARAMS['int'])) {
+        $query[$name] = (int) $value;
+      }
+      elseif (in_array(mb_strtolower($name), self::NUMERIC_QUERY_PARAMS['float'])) {
+        $query[$name] = (float) $value;
       }
     }
 
