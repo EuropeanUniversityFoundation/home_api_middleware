@@ -120,6 +120,11 @@ class HomeApiMiddlewareInventoryController extends ControllerBase {
    *   The response.
    */
   public function handleRequest(Request $request): JsonResponse {
+    if ($this->secondAttemptLeft) {
+      $this->tempStore->set('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjY3OTQ3MzcsIm9yaWdfaWF0IjoxNjY2NjIxOTM3LCJ1c2VySWQiOiJ0ZXN0QGdtYWlsLmNvbSJ9.c5j1jTcvtxElNbLnc037AQXPnaQpssraTsrj-QkCwnA');
+      sleep(1);
+    }
+
     $tokenResponse = $this->authManager->getToken(!$this->secondAttemptLeft);
 
     if (!isset($tokenResponse['token'])) {
